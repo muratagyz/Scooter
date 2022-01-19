@@ -1,0 +1,52 @@
+﻿<div class="notification-icon" style="margin-top:10px">
+    <span class="glyphicon glyphicon-envelope"></span>
+    <span class="badge" id="ntCnt"></span>
+</div>
+
+<div id="divNotificaion">
+
+
+</div>
+
+<script src="~/Scripts/jquery.signalR-2.2.2.js"></script>
+<script src="/signalr/Hubs"></script>
+
+<script>
+    $(document).ready(function () {
+
+        var hub = $.connection.myNewHub;
+
+        hub.client.displayStatus = function () {
+            getData();
+        }
+
+        $.connection.hub.start();
+        getData();
+
+        function getData() {
+            var divNotification = $("#divNotificaion");
+            $.ajax({
+                url: '/Api/Notification/GetNotification',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    data = $.parseJSON(data.Data);
+                    if (data.length > 0) {
+                        divNotification.empty();
+                        $("#ntCnt").text(data.length);
+
+                        for (var i = 0; i < data.length; i++) {
+                            var notification = '<div class="alert alert-success alert-dismissable">' +
+                                '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'
+                                + data[i].Message +
+                                '</div>';
+                            divNotification.append(notification);
+                        }
+                    }
+                }, erorr: function (r, e, w) {
+
+                }
+            })
+        }
+    });
+</script>
